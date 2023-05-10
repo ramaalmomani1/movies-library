@@ -5,10 +5,10 @@ const cors = require('cors');
 const data = require('./ Movie Data/ data.json');
 const axios = require('axios');
 const pg = require ('pg')
-
+require('dotenv').config();
 const client = new pg.Client(process.env.DBURL);
 
-require('dotenv').config();
+
 
 const app = express();
 app.use(cors());
@@ -21,7 +21,7 @@ app.get('/trending', handleTrending )
 app.get('/search', handleSearching )
 app.get('/movieGenres', handleGenres )
 app.get('/certifications', handleCertifications )
-app.post('/addMovie ', handleAddMovie  )
+app.post('/addMovie', handleAddMovie  )
 app.get('/getMovies', handleGetMovies )
 
 app.use(function(error, req, res, next) {
@@ -85,15 +85,15 @@ async function handleCertifications(req, res) {
 
 // //////////////get req
 function handleGetMovies(req, res){
-  const sql = `select * from info`;
+  const sql = `SELECT * FROM  info`;
   client.query(sql).then(data => {
     console.log(data)
     res.json({
     
       data: data.rows
     })
-  }).catch(err => (err,res,req))
-
+  }).catch(err => console.log("anything"))
+  
 }
 
 
@@ -110,7 +110,7 @@ function handleAddMovie(req, res){
   
     client.query(sql, handleValueFromUser).then(data => {
       res.status(201).json(data.rows)
-    }).catch(err => errorHandler(err, req, res))
+    }).catch(err => console.log("anything"))
   }
   
 
