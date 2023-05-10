@@ -4,6 +4,9 @@ const express = require('express');
 const cors = require('cors');
 const data = require('./ Movie Data/ data.json');
 const axios = require('axios');
+const pg = require ('pg')
+
+const client = new pg.Client(process.env.DBURL);
 
 require('dotenv').config();
 
@@ -18,7 +21,8 @@ app.get('/trending', handleTrending )
 app.get('/search', handleSearching )
 app.get('/movieGenres', handleGenres )
 app.get('/certifications', handleCertifications )
-
+app.post('/addMovie ', handleAddMovie  )
+app.get('/getMovies', handleGetMovies )
 
 app.use(function(error, req, res, next) {
   res.status(500).json({
@@ -79,6 +83,43 @@ async function handleCertifications(req, res) {
 }
 
 
+// //////////////get req
+function handleGetMovies(req, res){
+  const sql = `select * from info`;
+  client.query(sql).then(data => {
+    console.log(data)
+    res.json({
+    
+      data: data.rows
+    })
+  }).catch(err => (err,res,req))
+
+}
+
+
+
+
+
+
+//////////////Post req
+function handleAddMovie(req, res){
+    const userInput = req.body;
+    const sql = `insert into info(title, comments) values($1, $2) returning *`;
+  
+    const handleValueFromUser = [userInput.title, userInput.comments];
+  
+    client.query(sql, handleValueFromUser).then(data => {
+      res.status(201).json(data.rows)
+    }).catch(err => errorHandler(err, req, res))
+  }
+  
+
+
+
+
+
+
+
 
 
 function notFoundPage(req, res) {
@@ -99,9 +140,10 @@ function MovieData(id, title, release_date, poster_path, overview ) {
 }
 MovieData.allData = [];
 
-
+client.connect().then( (con) => {
+  console.log(con)
 app.listen(Port, () => console.log(`Up and Running on port ${Port}`));
-
+})
 
 
 // function handleMovie(req,res){
