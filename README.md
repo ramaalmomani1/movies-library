@@ -51,3 +51,6 @@ Routes:
 5. while when the user route to the favorite page a Welcoming message will appear.
 6. getMovie endpoint to add movie using get req.
 7. addMovie to get the list of movies added using post req.
+8. getMovie/id: endpoint to get a specific movie from the database using id.
+9. /UPDATE/id: endpoint to update the comments for a specific movie in the database.
+10. /DELETE/id: endpoint to remove a specific movie from your database.
