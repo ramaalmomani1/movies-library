@@ -15,7 +15,7 @@ app.use(cors());
 app.use(express.json());
 const Port = process.env.PORT || 5000
 
-// app.get('/', handleMovie);
+app.get('/', homeHandler);
 app.get('/favorite', handleFavorite)
 app.get('/trending', handleTrending)
 app.get('/search', handleSearching)
@@ -27,13 +27,24 @@ app.get('/getMovie/:id', handleGETMovieById)
 app.put('/UPDATE/:id', handelUpdate)
 app.delete('/DELETE/:id', handelDelete)
 
-app.use(function (error, req, res, next) {
-  res.status(500).json({
-    statusCode: 500,
-    responseTxt: 'Sorry, something went wrong'
-  })
-});
+// app.use(function (error, req, res, next) {
+//   res.status(500).json({
+//     statusCode: 500,
+//     responseTxt: 'Sorry, something went wrong'
+//   })
+// });
+
+app.use(errorHandler)
 app.use('*', notFoundPage)
+
+
+function homeHandler(req, res) {
+  res.status(200).json({
+    code: 200,
+    message: 'Welcome to the home page!'
+  })
+}
+
 
 
 function handleFavorite(req, res) {
@@ -45,7 +56,7 @@ async function handleTrending(req, res) {
 
   const data = await axios.get(`https://api.themoviedb.org/3/trending/all/day?api_key=${process.env.APIKEY}`)
   console.log(data.data)
-
+  MovieData.allData = [];
   data.data.results.map(item =>
     new MovieData(item.id, item.title, item.release_date, item.poster_path, item.overview)
   )
@@ -93,7 +104,7 @@ function handleGetMovies(req, res) {
 
       data: data.rows
     })
-  }).catch(err => console.log("anything"))
+  }).catch(err => errorHandler(err, req, res))
 
 }
 
@@ -105,18 +116,19 @@ function handleAddMovie(req, res) {
 
   client.query(sql, handleValueFromUser).then(data => {
     res.status(201).json(data.rows)
-  }).catch(err => console.log("anything"))
+  }).catch(err => errorHandler(err, req, res))
 }
 
 
 function handleGETMovieById(req, res) {
   const id = req.params.id
   const sql = `select * from info where id=${id}`
+  MovieData.allData = [];
   client.query(sql).then(data => {
     const recObj = new MovieData(data.rows[0].id, data.rows[0].title, data.rows[0].comments)
     res.status(200).json(recObj)
 
-  })
+  }).catch(err => errorHandler(err, req, res))
 }
 
 function handelUpdate(req,res){
@@ -137,10 +149,8 @@ function handelDelete(req,res){
       return res.status(204).json({
         // code: 204,
       })
-    }).catch(err => console.log("anything"))
+    }).catch(err => errorHandler(err, req, res))
   }
-
-
 
 
 
@@ -148,6 +158,13 @@ function notFoundPage(req, res) {
   res.status(404).json({
     statusCode: 404,
     responseTxt: 'Page Not Found Error'
+  })
+}
+
+function errorHandler(error, req, res) {
+  res.status(500).json({
+    code: 500,
+    message: error.message || error
   })
 }
 
@@ -162,21 +179,25 @@ function MovieData(id, title, release_date, poster_path, overview) {
 }
 MovieData.allData = [];
 
+
+
+
 client.connect().then((con) => {
   console.log(con)
   app.listen(Port, () => console.log(`Up and Running on port ${Port}`));
 })
 
 
+
 // function handleMovie(req,res){
 //   let result={};
-//   let newMovie = new MovieData (data.title,data.poster_path,data.overview);
+//   let newMovie = new HomeData (data.title,data.poster_path,data.overview);
 //   result= newMovie;
 //   res.json(result);
 // }
 
 
-// function MovieData(title, poster_path,  overview, ) {
+// function HomeData(title, poster_path,  overview, ) {
 //   this.title = title;
 //   this.poster_path= poster_path;
 //   this.overview= overview;
