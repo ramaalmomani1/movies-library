@@ -5,4 +5,4 @@ create table if not exists info (
   
 );
 
-insert into info(title, comments) values('test','hjjkbdsnkdsd')
+insert into info(title, comments) values('Titanic', '1997 film')

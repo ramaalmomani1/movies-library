@@ -101,7 +101,6 @@ function handleGetMovies(req, res) {
   client.query(sql).then(data => {
     console.log(data)
     res.json({
-
       data: data.rows
     })
   }).catch(err => errorHandler(err, req, res))
