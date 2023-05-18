@@ -6,7 +6,7 @@ const data = require('./ Movie Data/ data.json');
 const axios = require('axios');
 const pg = require('pg')
 require('dotenv').config();
-const client = new pg.Client(process.env.DBURL);
+const client = new pg.Client(process.env.DBURLLOCAL);
 
 
 
@@ -21,11 +21,15 @@ app.get('/trending', handleTrending)
 app.get('/search', handleSearching)
 app.get('/movieGenres', handleGenres)
 app.get('/certifications', handleCertifications)
-app.post('/addMovie', handleAddMovie)
+// app.post('/addMovie', handleAddMovie)
 app.get('/getMovies', handleGetMovies)
 app.get('/getMovie/:id', handleGETMovieById)
 app.put('/UPDATE/:id', handelUpdate)
 app.delete('/DELETE/:id', handelDelete)
+
+//front end endpoints
+app.get('/addMovie', handleAddMovieFront)
+app.post('/addMovie', handleAddMoviePostFront)
 
 // app.use(function (error, req, res, next) {
 //   res.status(500).json({
@@ -107,16 +111,16 @@ function handleGetMovies(req, res) {
 
 }
 
-function handleAddMovie(req, res) {
-  const userInput = req.body;
-  const sql = `insert into info(title, comments) values($1, $2) returning *`;
+// function handleAddMovie(req, res) {
+//   const userInput = req.body;
+//   const sql = `insert into info(title, comments) values($1, $2) returning *`;
 
-  const handleValueFromUser = [userInput.title, userInput.comments];
+//   const handleValueFromUser = [userInput.title, userInput.comments];
 
-  client.query(sql, handleValueFromUser).then(data => {
-    res.status(201).json(data.rows)
-  }).catch(err => errorHandler(err, req, res))
-}
+//   client.query(sql, handleValueFromUser).then(data => {
+//     res.status(201).json(data.rows)
+//   }).catch(err => errorHandler(err, req, res))
+// }
 
 
 function handleGETMovieById(req, res) {
@@ -130,27 +134,63 @@ function handleGETMovieById(req, res) {
   }).catch(err => errorHandler(err, req, res))
 }
 
-function handelUpdate(req,res){
+function handelUpdate(req, res) {
   const id = req.params.id
   const newData = req.body;
   const updatedData = [newData.title, newData.comments, id]
   const sql = `update info set title=$1, comments = $2 where id = $3 returning * `
-  client.query(sql,updatedData).then(data =>
+  client.query(sql, updatedData).then(data =>
     res.status(202).json(data.rows)
   )
 
 }
 
-function handelDelete(req,res){
+function handelDelete(req, res) {
   const id = req.params.id
-    const sql = `delete from info where id = ${id}`;
-    client.query(sql).then(() => {
-      return res.status(204).json({
-        // code: 204,
-      })
-    }).catch(err => errorHandler(err, req, res))
-  }
+  const sql = `delete from info where id = ${id}`;
+  client.query(sql).then(() => {
+    return res.status(204).json({
+      // code: 204,
+    })
+  }).catch(err => errorHandler(err, req, res))
+}
 
+
+
+function handleAddMovieFront(req, res) {
+  const sql = `select * from  front_movie_info`;
+  FavMovie.all = []
+  client.query(sql).then(data => {
+    console.log(data)
+    data.rows.map(item => new FavMovie(item.title, item.movie_id, item.poster_path, item.comments))
+    res.status(200).json({
+      data: FavMovie.all
+      // movie: data.results.rows
+    })
+  }).catch(err => errorHandler(err, req, res))
+}
+
+
+
+// function handleAddMoviePostFront(req, res) {
+//   const userInput = req.body;
+//   const sql = `insert into front_movie_info(title, poster_path, comments) values ($1 $2 $3 ) returning *`
+//   const sqlValues = [userInput.title, userInput.poster_path, userInput.comments]
+//   client.query(sql, sqlValues).then(result => {
+//     res.status(201).json(result.rows)
+//   }).catch(err => errorHandler(err, req, res));
+// }
+
+function handleAddMoviePostFront(req,res){
+  let {title,comments} = req.body ;
+  let sql = `INSERT INTO front_movie_info (title,comments)
+  VALUES ($1,$2) RETURNING *;`
+  let values = [title,comments];
+  client.query(sql,values).then((result)=>{
+      res.status(201).json(result.rows)
+  }
+  ).catch()
+}
 
 
 function notFoundPage(req, res) {
@@ -177,6 +217,15 @@ function MovieData(id, title, release_date, poster_path, overview) {
   MovieData.allData.push(this);
 }
 MovieData.allData = [];
+
+function FavMovie(title, id, image, comments) {
+  this.title = title;
+  this.id = id;
+  this.image = image;
+  this.comments = comments;
+  FavMovie.all.push(this);
+}
+FavMovie.all = []
 
 
 
