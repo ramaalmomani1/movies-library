@@ -36,7 +36,7 @@ app.post('/addMovie', handleAddMoviePostFront)
 //     statusCode: 500,
 //     responseTxt: 'Sorry, something went wrong'
 //   })
-// });
+// }); 
 
 app.use(errorHandler)
 app.use('*', notFoundPage)
@@ -182,10 +182,10 @@ function handleAddMovieFront(req, res) {
 // }
 
 function handleAddMoviePostFront(req,res){
-  let {title,comments} = req.body ;
-  let sql = `INSERT INTO front_movie_info (title,comments)
-  VALUES ($1,$2) RETURNING *;`
-  let values = [title,comments];
+  let {title,comments,poster_path,movie_id} = req.body ;
+  let sql = `INSERT INTO front_movie_info (title,comments,poster_path,movie_id)
+  VALUES ($1,$2,$3,$4) RETURNING *;`
+  let values = [title,comments,poster_path,movie_id];
   client.query(sql,values).then((result)=>{
       res.status(201).json(result.rows)
   }
@@ -208,20 +208,21 @@ function errorHandler(error, req, res) {
 }
 
 
-function MovieData(id, title, release_date, poster_path, overview) {
+function MovieData(id, title, release_date, poster_path) {
   this.id = id;
   this.title = title;
   this.release_date = release_date;
   this.poster_path = poster_path;
-  this.overview = overview;
   MovieData.allData.push(this);
 }
 MovieData.allData = [];
 
+
+
 function FavMovie(title, id, image, comments) {
   this.title = title;
   this.id = id;
-  this.image = image;
+  this.image_path = image;
   this.comments = comments;
   FavMovie.all.push(this);
 }
