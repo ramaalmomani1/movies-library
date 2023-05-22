@@ -48,7 +48,8 @@ function homeHandler(req, res) {
   res.status(200).json({
     code: 200,
     message: 'Welcome to the home page!'
-  })
+  }).catch(err => errorHandler(err, req, res))
+
 }
 
 
@@ -143,7 +144,7 @@ function handelUpdate(req, res) {
   const sql = `update info set title=$1, comments = $2 where id = $3 returning * `
   client.query(sql, updatedData).then(data =>
     res.status(202).json(data.rows)
-  )
+  ).catch(err => errorHandler(err, req, res))
 
 }
 
@@ -182,7 +183,7 @@ function handleAddMoviePostFront(req,res){
   client.query(sql,values).then((result)=>{
       res.status(201).json(result.rows)
   }
-  ).catch()
+  ).catch(err => errorHandler(err, req, res))
 }
 
 function handelFrontUpdate(req,res){
