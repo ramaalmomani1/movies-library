@@ -6,7 +6,7 @@ const data = require('./ Movie Data/ data.json');
 const axios = require('axios');
 const pg = require('pg')
 require('dotenv').config();
-const client = new pg.Client(process.env.DBURLLOCAL);
+const client = new pg.Client(process.env.DBURL);
 
 
 
