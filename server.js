@@ -65,7 +65,7 @@ async function handleTrending(req, res) {
   console.log(data.data)
   FavMovie.all = [];
   data.data.results.map(item =>
-    new FavMovie(item.title, item.id,item.movie_id,item.overview, item.poster_path, item.comments)
+    new FavMovie(item.title, item.id,item.overview, item.movie_id, item.poster_path, item.comments)
   )
 
   res.status(200).json({
@@ -73,6 +73,8 @@ async function handleTrending(req, res) {
 
   })
 }
+
+
 
 async function handleSearching(req, res) {
 
@@ -165,13 +167,15 @@ function handleAddMovieFront(req, res) {
   FavMovie.all = []
   client.query(sql).then(data => {
     console.log(data)
-    data.rows.map(item => new FavMovie(item.title, item.id,item.movie_id,item.overview, item.poster_path, item.comments))
+    data.rows.map(item => new FavMovie(item.title, item.id,item.overview, item.movie_id, item.poster_path, item.comments))
     res.status(200).json({
       data: FavMovie.all
       // movie: data.results.rows
     })
   }).catch(err => errorHandler(err, req, res))
 }
+
+
 
 
 
