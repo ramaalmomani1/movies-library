@@ -47,7 +47,7 @@ app.use('*', notFoundPage)
 function homeHandler(req, res) {
   res.status(200).json({
     code: 200,
-    message: 'Welcome to the home page!'
+    message: 'Welcome to the home page!!'
   })
 
 }
