@@ -2,14 +2,14 @@ create table if not exists info (
   id serial primary key, 
   title varchar(255),
   comments varchar(255)
-  
 );
 
 
 
-create table if not exists front_movie_info (
+create table if not exists front_movie_db (
   id serial primary key,
   movie_id integer,
+  overview varchar(1000),
   title varchar(255),
   poster_path varchar(1000),
   comments varchar(1000)
