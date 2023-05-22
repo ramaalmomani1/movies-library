@@ -48,7 +48,7 @@ function homeHandler(req, res) {
   res.status(200).json({
     code: 200,
     message: 'Welcome to the home page!'
-  }).catch(err => errorHandler(err, req, res))
+  })
 
 }
 
