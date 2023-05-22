@@ -63,13 +63,13 @@ async function handleTrending(req, res) {
 
   const data = await axios.get(`https://api.themoviedb.org/3/trending/all/day?api_key=${process.env.APIKEY}`)
   console.log(data.data)
-  MovieData.allData = [];
+  FavMovie.all = [];
   data.data.results.map(item =>
-    new MovieData(item.id, item.title, item.release_date, item.poster_path, item.overview)
+    new FavMovie(item.title, item.id,item.movie_id,item.overview, item.poster_path, item.comments)
   )
 
   res.status(200).json({
-    results: MovieData.allData
+    results: FavMovie.all
 
   })
 }
@@ -239,7 +239,7 @@ MovieData.allData = [];
 function FavMovie(title, id,overview, movie_id, image, comments) {
   this.title = title;
   this.id = id;
-  this.overview = overview;
+  this.overview = overview; 
  this.movie_id = movie_id
   this.poster_path = image;
   this.comments = comments;
