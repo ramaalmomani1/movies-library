@@ -30,6 +30,8 @@ app.delete('/DELETE/:id', handelDelete)
 //front end endpoints
 app.get('/addMovie', handleAddMovieFront)
 app.post('/addMovie', handleAddMoviePostFront)
+app.put('/addMovie/:id', handelFrontUpdate )
+app.delete('/addMovie/:id' , handelFrontDelete)
 
 // app.use(function (error, req, res, next) {
 //   res.status(500).json({
@@ -162,7 +164,7 @@ function handleAddMovieFront(req, res) {
   FavMovie.all = []
   client.query(sql).then(data => {
     console.log(data)
-    data.rows.map(item => new FavMovie(item.title, item.movie_id, item.poster_path, item.comments))
+    data.rows.map(item => new FavMovie(item.title, item.id,item.movie_id, item.poster_path, item.comments))
     res.status(200).json({
       data: FavMovie.all
       // movie: data.results.rows
@@ -172,24 +174,38 @@ function handleAddMovieFront(req, res) {
 
 
 
-// function handleAddMoviePostFront(req, res) {
-//   const userInput = req.body;
-//   const sql = `insert into front_movie_info(title, poster_path, comments) values ($1 $2 $3 ) returning *`
-//   const sqlValues = [userInput.title, userInput.poster_path, userInput.comments]
-//   client.query(sql, sqlValues).then(result => {
-//     res.status(201).json(result.rows)
-//   }).catch(err => errorHandler(err, req, res));
-// }
-
 function handleAddMoviePostFront(req,res){
-  let {title,comments,poster_path,movie_id} = req.body ;
+  let add = req.body ;
   let sql = `INSERT INTO front_movie_info (title,comments,poster_path,movie_id)
   VALUES ($1,$2,$3,$4) RETURNING *;`
-  let values = [title,comments,poster_path,movie_id];
+  let values = [add.title,add.comments,add.poster_path,add.movie_id];
   client.query(sql,values).then((result)=>{
       res.status(201).json(result.rows)
   }
   ).catch()
+}
+
+function handelFrontUpdate(req,res){
+  const id = req.params.id
+const userInput = req.body
+const sql = `update front_movie_info set title=$1,comments =$2,poster_path =$3 ,movie_id =$4 where id =${id} returning *`
+const values = [  userInput.title, userInput.comments , userInput.poster_path,  userInput.movie_id ]
+client.query(sql,values).then(result =>{
+res.status(202).json(result.rows)
+
+} ).catch(err => errorHandler(err, req, res))
+}
+
+
+function handelFrontDelete(req,res){
+  const id = req.params.id
+const sql = `DELETE FROM front_movie_info WHERE id = ${id}`
+client.query(sql).then(() =>{
+return res.status(204).json({
+code: 204
+}
+)
+}).catch(err => errorHandler(err, req, res))
 }
 
 
@@ -219,10 +235,11 @@ MovieData.allData = [];
 
 
 
-function FavMovie(title, id, image, comments) {
+function FavMovie(title, id,movie_id, image, comments) {
   this.title = title;
   this.id = id;
-  this.image_path = image;
+ this.movie_id = movie_id
+  this.poster_path = image;
   this.comments = comments;
   FavMovie.all.push(this);
 }
