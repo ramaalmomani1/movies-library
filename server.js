@@ -193,8 +193,8 @@ function handleAddMoviePostFront(req,res){
 function handelFrontUpdate(req,res){
   const id = req.params.id
 const userInput = req.body
-const sql = `update front_movie_db set title=$1,comments =$2,poster_path =$3 ,movie_id =$4, overview=$5 where id =${id} returning *`
-const values = [  userInput.title, userInput.comments , userInput.poster_path,  userInput.movie_id, userInput.overview ]
+const sql = `update front_movie_db set comments =$1 where id =${id} returning *`
+const values = [  userInput.comments ]
 client.query(sql,values).then(result =>{
 res.status(202).json(result.rows)
 
